@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-
-class Game
+﻿class Game
 {
     public static readonly string Title = "TSA Game";
-    public static readonly Vector2 Resolution = new Vector2(1024, 800);
+    public static readonly Vector2 Resolution = new Vector2(800, 640);
 
     public static readonly int MENU = 0;
     public static readonly int GAME = 1;
@@ -40,7 +37,7 @@ class Game
         {
             current = game;
         }
-        else if(SCREEN == PAUSE)
+        else if (SCREEN == PAUSE)
         {
             current = pause;
         }

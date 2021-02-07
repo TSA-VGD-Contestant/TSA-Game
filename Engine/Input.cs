@@ -50,7 +50,7 @@ static partial class Engine
         KeysDownAutorepeat.Clear();
         KeysUp.Clear();
         TypedText = "";
-        
+
         foreach (Gamepad gamepad in GamepadsByID.Values)
         {
             gamepad.ButtonsDown.Clear();

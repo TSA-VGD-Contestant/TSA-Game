@@ -181,7 +181,7 @@ static partial class Engine
         int tymax = texture.Height;
         int px = (int)bounds.Position.X;
         int py = (int)bounds.Position.Y;
-        
+
         // Don't let the overall size be so small that segment 9 has a negative size in either dimension:
         int sx = Math.Max((int)bounds.Size.X, txmax - bxmax + bxmin);
         int sy = Math.Max((int)bounds.Size.Y, tymax - bymax + bymin);

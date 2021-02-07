@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-class Button
+﻿class Button
 {
     private readonly Sound rollover = Engine.LoadSound("ButtonRollover.wav");
 
@@ -41,7 +35,7 @@ class Button
             }
             if (Engine.GetMouseButtonHeld(MouseButton.Left))
             {
-                if(!pressed)
+                if (!pressed)
                 {
                     Engine.PlaySound(rollover);
                 }
@@ -50,7 +44,7 @@ class Button
             }
             else
             {
-                if(pressed)
+                if (pressed)
                 {
                     Engine.PlaySound(rollover);
                     clicked = true;
@@ -64,7 +58,7 @@ class Button
         }
         else
         {
-            if(pressed && !Engine.GetMouseButtonHeld(MouseButton.Left))
+            if (pressed && !Engine.GetMouseButtonHeld(MouseButton.Left))
             {
                 Engine.PlaySound(rollover);
                 clicked = true;

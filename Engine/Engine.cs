@@ -1,6 +1,5 @@
 ﻿using SDL2;
 using System;
-using System.Collections.Generic;
 
 static partial class Engine
 {
