@@ -64,6 +64,11 @@
     <Compile Include="Engine\Utility\Vector2.cs" />
     <Compile Include="Engine\SDL2\SDL2_mixer.cs" />
     <Compile Include="Engine\SDL2\SDL2_ttf.cs" />
+    <Compile Include="Game\GameScreen.cs" />
+    <Compile Include="Game\MenuScreen.cs" />
+    <Compile Include="Game\PauseScreen.cs" />
+    <Compile Include="Game\Screen.cs" />
+    <Compile Include="GUI\Button.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
