@@ -26,14 +26,14 @@ class GameScreen : Screen
     {
         //Initializing pause button
         Texture tPause = Engine.LoadTexture("PauseNormal.png");
-        Pause = new Button(new Bounds2(25, 25, 50, 50), tPause, tPause, tPause);
+        Pause = new Button(new Bounds2(25, 25, 32, 32), tPause, tPause, tPause);
 
         LevelOne();
         LevelThree();
 
         SetLevel(bGRASS);
 
-        player = new Player(new Bounds2(100, 100, 32, 32), Engine.LoadTexture("PlayerForward.png"));
+        player = new Player(new Bounds2(100, 100, 64, 64), Engine.LoadTexture("PlayerForward.png"));
     }
 
 
@@ -52,8 +52,9 @@ class GameScreen : Screen
         }
 
         player.Input();
+        player.Update();
 
-        if(CURRENTLEVEL == bGRASS)
+        if (CURRENTLEVEL == bGRASS)
         {
             for (int y = 0; y < LevelOneTerrain.Length; y++)
             {
@@ -68,8 +69,7 @@ class GameScreen : Screen
                         {
                             if(player.GetJumpingState() == Player.JUMPINGSTATES.FALLING)
                             {
-                                player.SetPosition(new Vector2(player.GetPosition().X, (y * 32) - player.GetBounds().Size.X));
-                                player.SetVelocity(new Vector2(player.GetVelocity().X, 0));
+                                player.SetPosition(new Vector2(player.GetPosition().X, (y * 32) - player.GetBounds().Size.Y));
                                 player.SetJumpingState(Player.JUMPINGSTATES.STANDING);
                             }
                         }
@@ -102,7 +102,7 @@ class GameScreen : Screen
                 }
             }
         }
-        player.Update();
+
         player.Render();
 
     }
