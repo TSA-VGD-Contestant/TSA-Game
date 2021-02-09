@@ -3,7 +3,9 @@ using System.IO;
 
 class GameScreen : Screen
 {
-    private int[][] LevelOneTerrain;
+    private int[][] LevelOneTerrain, LevelTwoTerrain, LevelThreeTerrain;
+
+    private Player player;
 
     private readonly int tAIR = 0,
                          tGRASS = 1,
@@ -14,9 +16,11 @@ class GameScreen : Screen
 
     private readonly int bGRASS = 0,
                          bMOUNTAIN = 1,
-                         bSnOW = 2;
+                         bSNOW = 2;
     private int CURRENTLEVEL;
     private Button Pause;
+
+
 
     public GameScreen()
     {
@@ -24,10 +28,15 @@ class GameScreen : Screen
         Texture tPause = Engine.LoadTexture("PauseNormal.png");
         Pause = new Button(new Bounds2(25, 25, 50, 50), tPause, tPause, tPause);
 
-        CURRENTLEVEL = bGRASS;
-
         LevelOne();
+        LevelThree();
+
+        SetLevel(bGRASS);
+
+        player = new Player(new Bounds2(100, 100, 32, 32), Engine.LoadTexture("PlayerForward.png"));
     }
+
+
 
     public override void Update()
     {
@@ -42,6 +51,7 @@ class GameScreen : Screen
             Game.SetGameScreen(Game.PAUSE);
         }
 
+        player.Input();
 
         if(CURRENTLEVEL == bGRASS)
         {
@@ -50,27 +60,85 @@ class GameScreen : Screen
                 for (int x = 0; x < LevelOneTerrain[y].Length; x++)
                 {
                     int tile = LevelOneTerrain[y][x];
-                    if (tile == tGRASS)
+                    Bounds2 bounds = new Bounds2(x * 32, y * 32, 32, 32);
+                    DrawTile(tile, bounds);
+                    if(tile != tAIR)
                     {
-                        Engine.DrawRectSolid(new Bounds2(x * 32, y * 32, 32, 32), Color.Green);
+                        if (player.Hits(bounds))
+                        {
+                            if(player.GetJumpingState() == Player.JUMPINGSTATES.FALLING)
+                            {
+                                player.SetPosition(new Vector2(player.GetPosition().X, (y * 32) - player.GetBounds().Size.X));
+                                player.SetVelocity(new Vector2(player.GetVelocity().X, 0));
+                                player.SetJumpingState(Player.JUMPINGSTATES.STANDING);
+                            }
+                        }
                     }
-                    if (tile == tDIRT)
-                    {
-                        Engine.DrawRectSolid(new Bounds2(x * 32, y * 32, 32, 32), Color.Brown);
-                    }
+
                 }
             }
         }
-        
+        else if(CURRENTLEVEL == bMOUNTAIN)
+        {
+            for (int y = 0; y < LevelTwoTerrain.Length; y++)
+            {
+                for (int x = 0; x < LevelTwoTerrain[y].Length; x++)
+                {
+                    int tile = LevelTwoTerrain[y][x];
+                    Bounds2 bounds = new Bounds2(x * 32, y * 32, 32, 32);
+                    DrawTile(tile, bounds);
+                }
+            }
+        }
+        else if (CURRENTLEVEL == bSNOW)
+        {
+            for (int y = 0; y < LevelThreeTerrain.Length; y++)
+            {
+                for (int x = 0; x < LevelThreeTerrain[y].Length; x++)
+                {
+                    int tile = LevelThreeTerrain[y][x];
+                    Bounds2 bounds = new Bounds2(x * 32, y * 32, 32, 32);
+                    DrawTile(tile, bounds);
+                }
+            }
+        }
+        player.Update();
+        player.Render();
+
+    }
+
+    private void DrawTile(int tile, Bounds2 bounds)
+    {
+        if (tile == tGRASS)
+        {
+            Engine.DrawRectSolid(bounds, Color.Green);
+        }
+        else if (tile == tDIRT)
+        {
+            Engine.DrawRectSolid(bounds, Color.Brown);
+        }
+        else if (tile == tSTONE)
+        {
+            Engine.DrawRectSolid(bounds, Color.Gray);
+        }
+        else if (tile == tSNOW)
+        {
+            Engine.DrawRectSolid(bounds, Color.AliceBlue);
+        }
+        else if (tile == tICE)
+        {
+            Engine.DrawRectSolid(bounds, Color.CadetBlue);
+        }
     }
 
     private void LoadLevel(int LEVEL)
     {
-
+        
     }
 
     private void SetLevel(int LEVEL)
     {
+        CURRENTLEVEL = LEVEL;
         LoadLevel(LEVEL);
     }
 
@@ -108,6 +176,87 @@ class GameScreen : Screen
             for (int x = 0; x < tx; x++)
             {
                 LevelOneTerrain[y][x] = tDIRT;
+            }
+        }
+
+
+    }
+
+
+    private void LevelTwo()
+    {
+        int tx = (int)(Game.Resolution.X / 32);
+        int ty = (int)(Game.Resolution.Y / 32);
+        LevelThreeTerrain = new int[ty][];
+
+        for (int i = 0; i < LevelThreeTerrain.Length; i++)
+        {
+            LevelThreeTerrain[i] = new int[tx];
+        }
+
+        int height = 5;
+
+        //Set air
+        for (int y = 0; y < ty - height; y++)
+        {
+            for (int x = 0; x < tx; x++)
+            {
+                LevelThreeTerrain[y][x] = tAIR;
+            }
+        }
+
+        //Set grass
+        for (int x = 0; x < tx; x++)
+        {
+            LevelThreeTerrain[ty - height][x] = tSNOW;
+        }
+
+        //Set dirt
+        for (int y = ty - (height - 1); y < ty; y++)
+        {
+            for (int x = 0; x < tx; x++)
+            {
+                LevelThreeTerrain[y][x] = tICE;
+            }
+        }
+
+
+    }
+
+    private void LevelThree()
+    {
+        int tx = (int)(Game.Resolution.X / 32);
+        int ty = (int)(Game.Resolution.Y / 32);
+        LevelThreeTerrain = new int[ty][];
+
+        for (int i = 0; i < LevelThreeTerrain.Length; i++)
+        {
+            LevelThreeTerrain[i] = new int[tx];
+        }
+
+        int height = 5;
+
+        //Set air
+        for (int y = 0; y < ty - height; y++)
+        {
+            for (int x = 0; x < tx; x++)
+            {
+                LevelThreeTerrain[y][x] = tAIR;
+            }
+        }
+
+        //Set grass
+        for (int x = 0; x < tx; x++)
+        {
+            LevelThreeTerrain[ty - height][x] = tSNOW;
+        }
+
+        //Set dirt
+        for (int y = ty - (height - 1); y < ty; y++)
+        {
+            for (int x = 0; x < tx; x++)
+            {
+                LevelThreeTerrain[y][x] = tICE;
             }
         }
 

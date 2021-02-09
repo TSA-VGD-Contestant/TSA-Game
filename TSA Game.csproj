@@ -52,6 +52,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Engine\Audio.cs" />
+    <Compile Include="Entities\BaseEntity.cs" />
+    <Compile Include="Entities\Player.cs" />
+    <Compile Include="Entities\Zombie.cs" />
     <Compile Include="Game\Biome.cs" />
     <Compile Include="Engine\Utility\Bounds2.cs" />
     <Compile Include="Engine\Utility\Color.cs" />
@@ -59,6 +62,7 @@
     <Compile Include="Engine\Graphics.cs" />
     <Compile Include="Engine\Input.cs" />
     <Compile Include="Engine\Engine.cs" />
+    <Compile Include="Game\Camera.cs" />
     <Compile Include="Game\Game.cs" />
     <Compile Include="Engine\SDL2\SDL2.cs" />
     <Compile Include="Engine\SDL2\SDL2_image.cs" />
