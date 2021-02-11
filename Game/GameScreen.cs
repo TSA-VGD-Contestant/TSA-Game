@@ -13,10 +13,11 @@ class GameScreen : Screen
     }
     public override void Update()
     {
-        grass.Update(player);
+        Engine.DrawRectSolid(new Bounds2(0, 0, Game.Resolution.X, Game.Resolution.Y), Color.SkyBlue);
+
         player.Input();
+        grass.Update(player);
         player.Update();
-        player.Render();
         player.Render();
     }
 }
