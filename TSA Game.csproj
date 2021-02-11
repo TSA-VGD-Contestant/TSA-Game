@@ -52,18 +52,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Engine\Audio.cs" />
-    <Compile Include="Entities\BaseEntity.cs" />
-    <Compile Include="Entities\Player.cs" />
-    <Compile Include="Entities\Projectile.cs" />
-    <Compile Include="Entities\RayGun.cs" />
-    <Compile Include="Entities\Zombie.cs" />
-    <Compile Include="Game\Biome.cs" />
     <Compile Include="Engine\Utility\Bounds2.cs" />
     <Compile Include="Engine\Utility\Color.cs" />
     <Compile Include="Engine\Content.cs" />
     <Compile Include="Engine\Graphics.cs" />
     <Compile Include="Engine\Input.cs" />
     <Compile Include="Engine\Engine.cs" />
+    <Compile Include="Entities\Player.cs" />
     <Compile Include="Game\Camera.cs" />
     <Compile Include="Game\Game.cs" />
     <Compile Include="Engine\SDL2\SDL2.cs" />
@@ -72,12 +67,13 @@
     <Compile Include="Engine\SDL2\SDL2_mixer.cs" />
     <Compile Include="Engine\SDL2\SDL2_ttf.cs" />
     <Compile Include="Game\GameScreen.cs" />
+    <Compile Include="Game\GrassBiome.cs" />
     <Compile Include="Game\MenuScreen.cs" />
     <Compile Include="Game\PauseScreen.cs" />
     <Compile Include="Game\Screen.cs" />
     <Compile Include="GUI\Button.cs" />
-    <Compile Include="Entities\Weapon.cs" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>(robocopy "$(ProjectDir)Assets" "$(TargetDir)Assets" /MIR /W:1) ^&amp; IF %25ERRORLEVEL%25 LSS 8 SET ERRORLEVEL = 0
