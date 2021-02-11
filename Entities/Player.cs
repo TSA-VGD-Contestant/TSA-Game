@@ -23,9 +23,9 @@ class Player
     private float VelocityY;
 
     private const float JUMP = 5f;
-    private const float GRAV = 2.5f;
+    private const float GRAV = 1f;
     private const float MAXJUMPVEL = 10f;
-    private const float MAXGRAVVEL = 7.5f;
+    private const float MAXGRAVVEL = 5f;
 
     //Movement states
     //Walk state
@@ -51,13 +51,13 @@ class Player
     {
         ScreenX = Game.Resolution.X / 2 - Width / 2;
         ScreenY = 0;
-        Offset = -32;
+        Offset = 64;
 
         WalkState = WSTATE.STANDING;
         JumpState = JSTATE.STANDING;
     }
 
-    public void Input()
+    public void Input(List<List<int>> tiles)
     {
         if(Engine.GetKeyHeld(Key.A))
         {
@@ -71,16 +71,61 @@ class Player
         {
             WalkState = WSTATE.STANDING;
         }
-        if(Engine.GetKeyDown(Key.W) && JumpState == JSTATE.STANDING)
+        if(Engine.GetKeyHeld(Key.W) && JumpState == JSTATE.STANDING)
         {
             JumpState = JSTATE.JUMPING;
         }
 
-        Movement();
+        Velocities();
+
+        bool cx = false;
+        bool cy = false;
+
+        //Collision
+        Console.WriteLine(tiles.Count);
+        for (int y = 0; y < tiles.Count; y++)
+        {
+            for(int x = 0; x < tiles[y].Count; x++)
+            {
+
+                if(tiles[y][x] != GameScreen.AIR)
+                {
+                    Bounds2 tBounds = new Bounds2(((x - GrassBiome.LEVELONEWIDTH / 2) * GrassBiome.TILESIZE) - (Offset + VelocityX), y * GrassBiome.TILESIZE, GrassBiome.TILESIZE, GrassBiome.TILESIZE);
+                    if (GetBounds().Overlaps(tBounds))
+                    {
+                        cx = true;
+                    }
+
+                    tBounds = new Bounds2(((x - GrassBiome.LEVELONEWIDTH / 2) * GrassBiome.TILESIZE) - (Offset), (y * GrassBiome.TILESIZE), GrassBiome.TILESIZE, GrassBiome.TILESIZE);
+                    Bounds2 pBounds = new Bounds2(ScreenX + 11, ScreenY + VelocityY, Width, Height);
+                    if (pBounds.Overlaps(tBounds))
+                    {
+                        cy = true;
+                    }
+
+                }
+            }
+        }
+        if(cx)
+        {
+            VelocityX = 0;
+            WalkState = WSTATE.STANDING;
+            
+        }
+        if (cy)
+        {
+            VelocityY = 0;
+            JumpState = JSTATE.STANDING;
+        }
+        else if(JumpState == JSTATE.STANDING)
+        {
+            JumpState = JSTATE.FALLING;
+        }
     }
 
     public void Update()
     {
+        Console.WriteLine(VelocityY);
         Offset += VelocityX;
         ScreenY += VelocityY;
     }
@@ -90,7 +135,7 @@ class Player
         Engine.DrawTexture(texture, new Vector2(ScreenX, ScreenY));
     }
 
-    private void Movement()
+    private void Velocities()
     {
         switch (WalkState)
         {
@@ -191,7 +236,7 @@ class Player
 
     public Bounds2 GetBounds()
     {
-        return new Bounds2(ScreenX, ScreenY, Width, Height);
+        return new Bounds2(ScreenX + 11, ScreenY, Width, Height);
     }
 
     public float GetOffset()

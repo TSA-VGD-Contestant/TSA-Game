@@ -7,13 +7,11 @@ class GrassBiome
     private int[] Heights;
     private bool[] Flowers;
 
-    private const int AIR = 0,
-                      DIRT = 1,
-                      GRASS = 2;
 
-    public static readonly int LEVELONEWIDTH = 100;
 
-    private const int TILESIZE = 32;
+    public const int LEVELONEWIDTH = 1000;
+
+    public const int TILESIZE = 32;
 
     private readonly Bounds2 screen = new Bounds2(0, 0, Game.Resolution.X, Game.Resolution.Y);
 
@@ -24,7 +22,7 @@ class GrassBiome
         GenerateTerrain();
     }
 
-    public void Update(Player Player)
+    public void Update(float Offset)
     {
         if (Engine.GetKeyDown(Key.F))
         {
@@ -36,22 +34,22 @@ class GrassBiome
             {
 
                 int type = Terrain[y][x];
-                Bounds2 bounds = new Bounds2(((x - LEVELONEWIDTH / 2) * TILESIZE) - Player.GetOffset(), y * TILESIZE, TILESIZE, TILESIZE);
-
+                Bounds2 bounds = new Bounds2(((x - LEVELONEWIDTH / 2) * TILESIZE) - Offset, y * TILESIZE, TILESIZE, TILESIZE);
+                
 
 
                 if (screen.Overlaps(bounds))
                 {
                     switch (type)
                     {
-                        case AIR:
+                        case GameScreen.AIR:
                             Engine.DrawRectSolid(bounds, new Color(38, 198, 235));
                             //Engine.DrawRectEmpty(tileBounds, Color.Black);
                             break;
-                        case DIRT:
+                        case GameScreen.DIRT:
                             Engine.DrawRectSolid(bounds, Color.Brown);
                             break;
-                        case GRASS:
+                        case GameScreen.GRASS:
                             Engine.DrawRectSolid(bounds, Color.Green);
                             break;
                     }
@@ -63,7 +61,7 @@ class GrassBiome
         {
             if(Flowers[x] == true)
             {
-                Engine.DrawTexture(Flower, new Vector2(((x - LEVELONEWIDTH / 2) * TILESIZE) - Player.GetOffset(), Heights[x] * 32 - 32));
+                Engine.DrawTexture(Flower, new Vector2(((x - LEVELONEWIDTH / 2) * TILESIZE) - Offset, Heights[x] * TILESIZE - TILESIZE));
             }
         }
     }
@@ -71,6 +69,7 @@ class GrassBiome
     private void GenerateTerrain()
     {
         Random rand = new Random();
+        
         //Grass
         Noise.Seed = rand.Next(0, 999999999);
         int flatness = 100;
@@ -93,24 +92,24 @@ class GrassBiome
                 if (y == height)
                 {
                     Heights[x] = height;
-                    Terrain[y].Add(GRASS);
+                    Terrain[y].Add(GameScreen.GRASS);
                 }
                 else if (y < height)
                 {
-                    Terrain[y].Add(AIR);
+                    Terrain[y].Add(GameScreen.AIR);
                 }
                 else if (y > height)
                 {
-                    Terrain[y].Add(DIRT);
+                    Terrain[y].Add(GameScreen.DIRT);
                 }
             }
         }
+        
 
         Flowers = new bool[LEVELONEWIDTH];
         for(int x = 0; x < LEVELONEWIDTH; x++)
         {
             int num = (int)(rand.NextDouble() * 10);
-            Console.WriteLine(num);
             if (num == 1)
             {
                 
@@ -121,75 +120,10 @@ class GrassBiome
                 Flowers[x] = false;
             }
         }
+    }
 
-
-        //Snow
-            /*
-            Noise.Seed = new Random().Next(0, 999999999);
-            int flatness = 50;
-            float[] noise = Noise.Calc1D(flatness * LEVELONEWIDTH, 0.1f);
-            Terrain = new List<List<int>>((int)(Game.Resolution.Y / TILESIZE));
-            for (int y = 0; y < (int)(Game.Resolution.Y / TILESIZE); y++)
-            {
-                Terrain.Add(new List<int>(LEVELONEWIDTH));
-                for (int x = 0; x < LEVELONEWIDTH; x++)
-                {
-                    int height = 0;
-                    for (int i = 0; i < flatness; i++)
-                    {
-                        height += (int)noise[x + i];
-                    }
-                    height /= (flatness * 7);
-                    height -= 4;
-                    if (y == height)
-                    {
-
-                        Terrain[y].Add(GRASS);
-                    }
-                    else if (y < height)
-                    {
-                        Terrain[y].Add(AIR);
-                    }
-                    else if (y > height)
-                    {
-                        Terrain[y].Add(DIRT);
-                    }
-                }
-            }
-            */
-            //Mountain
-            /*
-            Noise.Seed = new Random().Next(0, 999999999);
-            int flatness = 15;
-            float[] noise = Noise.Calc1D(flatness * LEVELONEWIDTH, 0.1f);
-            Terrain = new List<List<int>>((int)(Game.Resolution.Y / TILESIZE));
-            for (int y = 0; y < (int)(Game.Resolution.Y / TILESIZE); y++)
-            {
-                Terrain.Add(new List<int>(LEVELONEWIDTH));
-                for (int x = 0; x < LEVELONEWIDTH; x++)
-                {
-                    int height = 0;
-                    for (int i = 0; i < flatness; i++)
-                    {
-                        height += (int)noise[x + i];
-                    }
-                    height /= (flatness * 7);
-                    height -= 8;
-                    if (y == height)
-                    {
-
-                        Terrain[y].Add(GRASS);
-                    }
-                    else if (y < height)
-                    {
-                        Terrain[y].Add(AIR);
-                    }
-                    else if (y > height)
-                    {
-                        Terrain[y].Add(DIRT);
-                    }
-                }
-            }
-            */
+    public List<List<int>> GetTiles()
+    {
+        return Terrain;
     }
 }
