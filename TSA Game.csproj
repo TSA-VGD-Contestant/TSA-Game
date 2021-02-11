@@ -69,6 +69,7 @@
     <Compile Include="Game\GameScreen.cs" />
     <Compile Include="Game\GrassBiome.cs" />
     <Compile Include="Game\MenuScreen.cs" />
+    <Compile Include="Game\Noise.cs" />
     <Compile Include="Game\PauseScreen.cs" />
     <Compile Include="Game\Screen.cs" />
     <Compile Include="GUI\Button.cs" />

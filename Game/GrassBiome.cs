@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 
 class GrassBiome
@@ -11,7 +8,7 @@ class GrassBiome
 
     private const int AIR = 0,
                       DIRT = 1,
-                      GRASS = 2;         
+                      GRASS = 2;
 
     public static readonly int LEVELONEWIDTH = 100;
 
@@ -21,7 +18,7 @@ class GrassBiome
 
     public GrassBiome()
     {
-        InitTerrain();
+        GenerateTerrain();
     }
 
     public void Update(Player Player)
@@ -30,25 +27,25 @@ class GrassBiome
         {
             for (int x = 0; x < Terrain[y].Count; x++)
             {
-                
+
                 int type = Terrain[y][x];
                 Bounds2 tileBounds = new Bounds2(((x - LEVELONEWIDTH / 2) * TILESIZE) - Player.GetOffset(), y * TILESIZE, TILESIZE, TILESIZE);
-                
-                if(screen.Overlaps(tileBounds))
+
+                if (screen.Overlaps(tileBounds))
                 {
                     switch (type)
                     {
                         case AIR:
                             Engine.DrawRectSolid(tileBounds, Color.Blue);
-                            Engine.DrawRectEmpty(tileBounds, Color.Black);
+                            //Engine.DrawRectEmpty(tileBounds, Color.Black);
                             break;
                         case DIRT:
                             Engine.DrawRectSolid(tileBounds, Color.Brown);
-                            Engine.DrawRectEmpty(tileBounds, Color.Black);
+                            //Engine.DrawRectEmpty(tileBounds, Color.Black);
                             break;
                         case GRASS:
                             Engine.DrawRectSolid(tileBounds, Color.Green);
-                            Engine.DrawRectEmpty(tileBounds, Color.Black);
+                            //Engine.DrawRectEmpty(tileBounds, Color.Black);
                             break;
                     }
                 }
@@ -57,22 +54,31 @@ class GrassBiome
         }
     }
 
-    private void InitTerrain()
+    private void GenerateTerrain()
     {
+        Noise.Seed = new Random().Next(0, 1000000000);
+        float[] noise = Noise.Calc1D(10 * LEVELONEWIDTH, 0.01f);
         Terrain = new List<List<int>>((int)(Game.Resolution.Y / TILESIZE));
-        Terrain.Add(new List<int>());
-        for(int y = 0; y < (int)(Game.Resolution.Y / TILESIZE); y++)
+        //Terrain.Add(new List<int>());
+        for (int y = 0; y < (int)(Game.Resolution.Y / TILESIZE); y++)
         {
             Terrain.Add(new List<int>(LEVELONEWIDTH));
-            for(int x = 0; x < LEVELONEWIDTH; x++)
+            for (int x = 0; x < LEVELONEWIDTH; x++)
             {
-                if (y <= 10)
+                int height = 0;
+                for(int i = 0; i < 10; i++)
                 {
-                    Terrain[y].Add(AIR);
+                   height += (int)noise[x + i];
                 }
-                else if (y <= 11)
+                height /= 100;
+                Console.WriteLine(height);
+                if (y == height)
                 {
                     Terrain[y].Add(GRASS);
+                }
+                else if (y <= height)
+                {
+                    Terrain[y].Add(AIR);
                 }
                 else
                 {
