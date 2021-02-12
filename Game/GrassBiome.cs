@@ -9,13 +9,15 @@ class GrassBiome
 
 
 
-    public const int LEVELONEWIDTH = 1000;
+    public const int LEVELONEWIDTH = 50;
 
     public const int TILESIZE = 32;
 
     private readonly Bounds2 screen = new Bounds2(0, 0, Game.Resolution.X, Game.Resolution.Y);
 
     private readonly Texture Flower = Engine.LoadTexture("Flower.png");
+
+    private readonly CloudGenerator clouds = new CloudGenerator(); 
 
     public GrassBiome()
     {
@@ -24,6 +26,7 @@ class GrassBiome
 
     public void Update(float Offset)
     {
+        
         if (Engine.GetKeyDown(Key.F))
         {
             GenerateTerrain();
@@ -64,6 +67,8 @@ class GrassBiome
                 Engine.DrawTexture(Flower, new Vector2(((x - LEVELONEWIDTH / 2) * TILESIZE) - Offset, Heights[x] * TILESIZE - TILESIZE));
             }
         }
+
+        //clouds.Update(Offset);
     }
 
     private void GenerateTerrain()

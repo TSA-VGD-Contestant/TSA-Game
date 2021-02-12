@@ -8,23 +8,24 @@ using System.Threading.Tasks;
 class Player
 {
     //Player Texture
-    //TODO: Player Animation
     private readonly Texture Standing = Engine.LoadTexture("PlayerForward.png");
-    private readonly Texture Jumping = Engine.LoadTexture("PlayerJumping.png");
-    private readonly Texture JumpingLeft = Engine.LoadTexture("PlayerJumping.png");
-    private readonly Texture JumpingRight = Engine.LoadTexture("PlayerJumping.png");
+    //private readonly Texture Jumping = Engine.LoadTexture("PlayerJumping.png");
+    //private readonly Texture JumpingLeft = Engine.LoadTexture("PlayerJumping.png");
+    //private readonly Texture JumpingRight = Engine.LoadTexture("PlayerJumping.png");
     private readonly Texture Right = Engine.LoadTexture("PlayerRight.png");
     private readonly Texture Left = Engine.LoadTexture("PlayerLeft.png");
-    private readonly float WalkRate = 4f;
+    private readonly float AnimationRate = 2.5f;
+    private float StandingIndex = 0f;
     private float RightIndex = 0f;
     private float LeftIndex = 0f;
+
     private Texture Current;
 
     private readonly float ScreenX;
     private float ScreenY;
     private float Offset;
-    private readonly float Width = 46f;
-    private readonly float Height = 62f;
+    private readonly float Width = 50;
+    private readonly float Height = 62;
 
     //Movement variables
     private const float ACCELX = 0.5f;
@@ -67,6 +68,8 @@ class Player
 
         WalkState = WSTATE.STANDING;
         JumpState = JSTATE.STANDING;
+
+        Current = Standing;
     }
 
     public void Input(List<List<int>> tiles)
@@ -98,29 +101,42 @@ class Player
         {
             for(int x = 0; x < tiles[y].Count; x++)
             {
-
+                Bounds2 tBounds;
                 if(tiles[y][x] != GameScreen.AIR)
                 {
-                    Bounds2 tBounds = new Bounds2(((x - GrassBiome.LEVELONEWIDTH / 2) * GrassBiome.TILESIZE) - (Offset + VelocityX), y * GrassBiome.TILESIZE, GrassBiome.TILESIZE, GrassBiome.TILESIZE);
+                    tBounds = new Bounds2(((x - GrassBiome.LEVELONEWIDTH / 2) * GrassBiome.TILESIZE) - (Offset + VelocityX), y * GrassBiome.TILESIZE, GrassBiome.TILESIZE, GrassBiome.TILESIZE);
                     if (GetBounds().Overlaps(tBounds))
                     {
                         cx = true;
                     }
 
                     tBounds = new Bounds2(((x - GrassBiome.LEVELONEWIDTH / 2) * GrassBiome.TILESIZE) - (Offset), (y * GrassBiome.TILESIZE), GrassBiome.TILESIZE, GrassBiome.TILESIZE);
-                    Bounds2 pBounds = new Bounds2(ScreenX, ScreenY + VelocityY, Width, Height);
+                    Bounds2 pBounds = new Bounds2(ScreenX + 7, ScreenY + VelocityY, Width, Height);
                     if (pBounds.Overlaps(tBounds))
                     {
                         cy = true;
                     }
-
+                    tBounds = new Bounds2(((x - GrassBiome.LEVELONEWIDTH / 2) * GrassBiome.TILESIZE) - (Offset), y * GrassBiome.TILESIZE, GrassBiome.TILESIZE, GrassBiome.TILESIZE);
+                    float dx = VelocityX / Math.Abs(VelocityX);
+                    
+                    float dy = VelocityY / Math.Abs(VelocityY);
+                    if (GetBounds().Overlaps(tBounds))
+                    {
+                        tBounds = new Bounds2(((x - GrassBiome.LEVELONEWIDTH / 2) * GrassBiome.TILESIZE) - (Offset), y * GrassBiome.TILESIZE, GrassBiome.TILESIZE, GrassBiome.TILESIZE);
+                        while (GetBounds().Overlaps(tBounds))
+                        {
+                            ScreenY -= 1;
+                        }
+                    }
                 }
             }
         }
-        if(cx)
+        
+        if (cx)
         {
             VelocityX = 0;
             WalkState = WSTATE.STANDING;
+            Current = Standing;
             
         }
         if (cy)
@@ -143,45 +159,31 @@ class Player
 
     public void Render()
     {
-        Bounds2 AnimBounds;
-        if(JumpState == JSTATE.JUMPING)
+        //Animation
+        StandingIndex = (StandingIndex + Engine.TimeDelta * AnimationRate) % 2.0f;
+        RightIndex = (RightIndex + Engine.TimeDelta * AnimationRate) % 2.0f;
+        LeftIndex = (LeftIndex + Engine.TimeDelta * AnimationRate) % 2.0f;
+
+        Bounds2 AnimationBounds = new Bounds2(0,0,64,64);
+
+        if(WalkState == WSTATE.STANDING)
         {
-            switch (WalkState)
-            {
-                case WSTATE.LEFT:
-                    Engine.DrawTexture(JumpingLeft, new Vector2(ScreenX, ScreenY + 1));
-                    return;
-                case WSTATE.RIGHT:
-                    Engine.DrawTexture(JumpingRight, new Vector2(ScreenX, ScreenY + 1));
-                    return;
-                case WSTATE.STANDING:
-                    Engine.DrawTexture(Jumping, new Vector2(ScreenX, ScreenY + 1));
-                    return;
-            }
+            AnimationBounds = new Bounds2(((int)StandingIndex) * 64, 0, 64, 64);
+            Current = Standing;
         }
-        else
+        else if(WalkState == WSTATE.RIGHT)
         {
-            switch (WalkState)
-            {
-                case WSTATE.LEFT:
-                    LeftIndex = (LeftIndex + Engine.TimeDelta * WalkRate) % 2f;
-                    AnimBounds = new Bounds2(((int)LeftIndex * 46), 0, 46, 62);
-                    Engine.DrawTexture(Left, new Vector2(ScreenX, ScreenY + 1), source: AnimBounds);
-                    break;
-                case WSTATE.RIGHT:
-                    RightIndex = (RightIndex + Engine.TimeDelta * WalkRate) % 2f;
-                    AnimBounds = new Bounds2(((int)RightIndex * 46), 0, 46, 62);
-                    Engine.DrawTexture(Right, new Vector2(ScreenX, ScreenY + 1), source: AnimBounds);
-                    break;
-                case WSTATE.STANDING:
-                    Engine.DrawTexture(Standing, new Vector2(ScreenX, ScreenY + 1));
-                    break;
-            }
+            AnimationBounds = new Bounds2(((int)RightIndex) * 48, 0, 48, 64);
+            Current = Right;
         }
-        
-        
-        
-        
+        else if(WalkState == WSTATE.LEFT)
+        {
+            AnimationBounds = new Bounds2(((int)LeftIndex) * 48, 0, 48, 64);
+            Current = Left;
+        }
+
+
+        Engine.DrawTexture(Current, new Vector2(ScreenX, ScreenY), source: AnimationBounds);
     }
 
     private void Velocities()
@@ -248,7 +250,7 @@ class Player
 
     public float GetScreenX()
     {
-        return ScreenX;
+        return ScreenX + 7;
     }
 
     public void SetOffset(float x)
@@ -288,7 +290,7 @@ class Player
 
     public Bounds2 GetBounds()
     {
-        return new Bounds2(ScreenX, ScreenY, Width, Height);
+        return new Bounds2(ScreenX + 7, ScreenY, Width, Height);
     }
 
     public float GetOffset()
